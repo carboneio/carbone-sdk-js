@@ -1,4 +1,4 @@
-# Carbone Render Go Javascript
+# Carbone Render Javascript
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000)
 [![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen.svg)](https://carbone.io/api-reference.html#carbone-sdk-javascript)
 
