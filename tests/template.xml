@@ -1,0 +1,3 @@
+<div>
+  {d.firstname} {d.lastname} {d.age} {d.location} {d.postalcode}
+</div>
