@@ -175,7 +175,7 @@ const carboneRenderSDK = function (accessToken) {
       }
       return this.getReport(_renderResponse.data.renderId, responseType);
     },
-    generateTemplateId: async function (fileContent, payload) {
+    generateTemplateId: async function (fileContent, payload = "") {
       function arrayBufferToHexa(buffer) {
         var digest = "";
         var view = new DataView(buffer);
@@ -192,9 +192,6 @@ const carboneRenderSDK = function (accessToken) {
           digest += paddedValue;
         }
         return digest;
-      }
-      if (!payload) {
-        payload = "";
       }
       var bufferContent = new TextEncoder("utf-8").encode(
         payload + fileContent

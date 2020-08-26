@@ -1,4 +1,7 @@
 {
   "testEnvironment": "jsdom",
-  "verbose": true
+  "verbose": true,
+  "setupFiles": [
+    "./tests/jest.setup.js"
+  ]
 }

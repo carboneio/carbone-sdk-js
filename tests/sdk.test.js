@@ -1,43 +1,10 @@
 /* eslint-disable no-undef */
-
+require("../src/main.js");
 var fs = require("fs");
 const fetchMock = require("fetch-mock-jest");
-require("../src/main.js");
-const carboneRenderSDK = global.carboneRenderSDK;
-// FormDataMock for addTemplate
-function FormDataMock() {
-  this.append = jest.fn();
-}
-global.FormData = FormDataMock;
-// Text encoder for getTemplateId
-const { TextEncoder } = require("util");
-global.TextEncoder = TextEncoder;
-const crypto = require("crypto");
-global.crypto = {
-  subtle: {
-    digest: function (algo, content) {
-      return new Promise((resolutionFunc) => {
-        resolutionFunc(
-          arrayBufferToUint8Array(
-            crypto
-              .createHash("sha256")
-              .update(new Buffer.from(content))
-              .digest()
-          )
-        );
-      });
-    },
-  },
-};
 
-function arrayBufferToUint8Array(buf) {
-  var ab = new ArrayBuffer(buf.length);
-  var view = new Uint8Array(ab);
-  for (var i = 0; i < buf.length; ++i) {
-    view[i] = buf[i];
-  }
-  return ab;
-}
+// `global` jest === `document.window`
+const carboneRenderSDK = global.carboneRenderSDK;
 
 describe("Tests configurations", function () {
   const _carboneSDK = carboneRenderSDK("Token1234");
@@ -380,42 +347,48 @@ describe("Test render", function () {
 
 describe("Test Calculate hash", function () {
   const _carboneSDK = carboneRenderSDK("Token1234");
-
   test("should convert a file content into a templateId 1", async function () {
-    const _expectedTemplateId =
-      "20f36c2e4d1702a839ec001295696fa730a521d3afabed5f2ddc824c6897aea4";
-    const _templateId = await _carboneSDK.generateTemplateId(
-      "<html>This is some content</html>"
-    );
-    expect(_templateId).toStrictEqual(_expectedTemplateId);
+    const _content = "<html>This is some content</html>";
+    const _templateIdNode = global.generateTemplateIdFromNode(_content);
+    const _templateId = await _carboneSDK.generateTemplateId(_content);
+    expect(_templateId).toStrictEqual(_templateIdNode);
   });
 
   test("should convert a file content into a templateId with a payload 2", async function () {
-    const _expectedTemplateId =
-      "2ec287a920778b7d8ee9ffa05b3f3669dfc48580676ee110f0504c320ab9bba8";
-    const _templateId = await _carboneSDK.generateTemplateId(
-      "<html>This is some content</html>",
-      "Payload1234"
+    const _content = "<html>This is some content</html>";
+    const _payload = "Payload1234";
+    const _templateIdNode = global.generateTemplateIdFromNode(
+      _content,
+      _payload
     );
-    expect(_templateId).toStrictEqual(_expectedTemplateId);
+    const _templateId = await _carboneSDK.generateTemplateId(
+      _content,
+      _payload
+    );
+    expect(_templateId).toStrictEqual(_templateIdNode);
   });
 
   test("should convert a file content into a templateId 3 ", async function () {
-    const _expectedTemplateId =
-      "eced89abaf7ab36dfb5f1507759cd53c5347ef06a45f42e791b487ee45c7b404";
-    const _templateId = await _carboneSDK.generateTemplateId(
-      "<html>This is some content {d.firstname} {d.lastname}</html>"
-    );
-    expect(_templateId).toStrictEqual(_expectedTemplateId);
+    const _content =
+      "<html>This is some content {d.firstname} {d.lastname}</html>";
+    const _templateIdNode = global.generateTemplateIdFromNode(_content);
+    const _templateId = await _carboneSDK.generateTemplateId(_content);
+    expect(_templateId).toStrictEqual(_templateIdNode);
   });
 
   test("should convert a file content into a templateId with a payload 4", async function () {
-    const _expectedTemplateId =
-      "16c253baf9c89d1f3495deb4565324d99f3d76c9c76efcd2b4f495d43c6e8096";
-    const _templateId = await _carboneSDK.generateTemplateId(
-      "<html>This is some content {d.firstname} {d.lastname}</html>",
-      "Payload1234This is a long payload with different characters 1 *5 &*9 %$ 3%&@9 @(( 3992288282 29299 9299929"
+    const _content =
+      "<html>This is some content {d.firstname} {d.lastname}</html>";
+    const _payload =
+      "Payload1234This is a long payload with different characters 1 *5 &*9 %$ 3%&@9 @(( 3992288282 29299 9299929";
+    const _templateIdNode = global.generateTemplateIdFromNode(
+      _content,
+      _payload
     );
-    expect(_templateId).toStrictEqual(_expectedTemplateId);
+    const _templateId = await _carboneSDK.generateTemplateId(
+      _content,
+      _payload
+    );
+    expect(_templateId).toStrictEqual(_templateIdNode);
   });
 });
