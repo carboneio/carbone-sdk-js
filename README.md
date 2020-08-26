@@ -20,7 +20,7 @@ npm install github.com/Ideolys/carbone-sdk-javascript
 ## Documentation
 
 - [API REFERENCE](./doc/API-REFERENCE.md)
-- [Basic integration example](./doc/index.example.html)
+- [Integration example](./doc/index.example.html)
 
 ## Build for production
 
