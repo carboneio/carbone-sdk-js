@@ -38,10 +38,6 @@ If you need to test the generation of templateId, you can use the nodejs `main.j
 $ node ./tests/generate_template_id.js
 ```
 
-## 👤 Author
-
-- [**@steevepay**](https://github.com/steevepay)
-
 ## 🤝 Contributing
 
 Contributions, issues and feature requests are welcome!
@@ -51,3 +47,7 @@ Feel free to check [issues page](https://github.com/Ideolys/carbone-sdk-go/issue
 ## Show your support
 
 Give a ⭐️ if this project helped you!
+
+## 👤 Author
+
+- [**@steevepay**](https://github.com/steevepay)
