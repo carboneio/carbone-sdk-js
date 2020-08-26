@@ -114,7 +114,7 @@ function setAccessToken(newToken)
 ```
 It sets the Carbone access token.
 
-### set_api_version
+### setApiVersion
 ```javascript
 function setApiVersion(version)
 ```
