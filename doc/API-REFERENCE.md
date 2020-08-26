@@ -61,7 +61,7 @@ You can add multiple times the same template and get different template ID thank
 ```javascript
 const carboneService = window.carboneRenderSDK("eyJhbGc...");
 
-carboneService.addTemplate(file, "").then(data => {
+carboneService.addTemplate(file).then(data => {
   if (data.success === true) {
     // templateId: data.data.templateId
   } else {
