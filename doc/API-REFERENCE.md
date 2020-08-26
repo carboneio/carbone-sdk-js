@@ -88,6 +88,7 @@ carboneService.getTemplate("templateId").then(file => {
 ```javascript
 async function deleteTemplate(templateId);
 ```
+Delete a template from a `templateId`.
 
 **Example**
 ```javascript
