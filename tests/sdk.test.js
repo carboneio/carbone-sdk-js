@@ -275,13 +275,45 @@ describe("Test render", function () {
     fetchMock.reset();
   });
 
-  // TODO: should render a report from an existing template, the template has already been uploaded (it generate the templateId + renderReport) [case 2]
+  test("should render a report from an existing template, the template has already been uploaded (it generate the templateId + renderReport) [case 2]", async function() {
+    const _content = "<html>This is some content {d.firstname} {d.lastname}</html>";
+    const _templateId = "eced89abaf7ab36dfb5f1507759cd53c5347ef06a45f42e791b487ee45c7b404";
+    const _renderId = "RenderId1234";
+    const _expectedFileName = "FOEWIFJEWO12324.pdf"
+    const _expectedContent = "<html>This is some content John Wick</html>"
+    fetchMock.post(
+      `https://render.carbone.io/render/${_templateId}`,
+      `{"success" : true, "error" : null,"data": {"renderId": "${_renderId}"}}`
+    );
+    fetchMock.get(
+      `https://render.carbone.io/render/${_renderId}`,
+      {
+        body: _expectedContent,
+        headers: {
+          "content-disposition": `filename="${_expectedFileName}"`
+        }
+      }
+    )
+    const _response = await _carboneSDK.render(_content, {data: {firstname: "John", lastname: "Wick"}, exportTo:"pdf"}, "", "blob");
+     // Convert blob to string
+     const _resp = await _response.content.arrayBuffer().then((buf) => {
+      return Buffer.from(buf).toString();
+    });
+    expect(_resp).toStrictEqual(_expectedContent);
+    expect(_response.name).toStrictEqual(_expectedFileName);
+
+    const _fetchCalls = fetchMock.calls();
+    expect(_fetchCalls[0][0]).toBe(`https://render.carbone.io/render/${_templateId}`);
+    expect(_fetchCalls[1][0]).toBe(`https://render.carbone.io/render/${_renderId}`);
+    expect(_fetchCalls.length).toBe(2);
+    fetchMock.reset();
+  });
 
   test("should render a report from a fresh new template (path as argument + payload) [case 3]", async function () {
     const data = fs.readFileSync("./tests/template.xml");
     const _fakeData = { data: { firstname: "John", lastname: "wick" } };
     const _templateId =
-      "20f36c2e4d1702a839ec001295696fa730a521d3afabed5f2ddc824c6897aea4";
+      "0a05c07abca8829654d4df98352057b6ba98a26e8319e825203ab7800e30cc18";
     const _renderId = "renderId43215";
     const _expectedContent = data
       .toString()
@@ -293,11 +325,16 @@ describe("Test render", function () {
       success: true,
       data: { templateId: _templateId },
     });
+    let _renderCounter = 0;
     fetchMock.post(
       `https://render.carbone.io/render/${_templateId}`,
-      `{"success" : true, "error" : null,"data": {"renderId": "` +
-        _renderId +
-        `"}}`
+      function () {
+        _renderCounter++;
+        if (_renderCounter >= 2) {
+          return `{"success" : true, "error" : null,"data": {"renderId": "${_renderId}"}}`
+        }
+        return `{"success" : false, "error" : "the template does not exist"}`
+      }
     );
     fetchMock.get(`https://render.carbone.io/render/${_renderId}`, {
       body: _expectedContent,
@@ -309,7 +346,8 @@ describe("Test render", function () {
     const _response = await _carboneSDK.render(
       data.toString(),
       _fakeData,
-      "text"
+      "",
+      "blob"
     );
     // Convert blob to string
     const _resp = await _response.content.arrayBuffer().then((buf) => {
@@ -317,17 +355,25 @@ describe("Test render", function () {
     });
     expect(_resp).toStrictEqual(_expectedContent);
     expect(_response.name).toStrictEqual(_expectedFileName);
+
+    const _fetchCalls = fetchMock.calls();
+    expect(_fetchCalls[0][0]).toBe(`https://render.carbone.io/render/${_templateId}`);
+    expect(_fetchCalls[1][0]).toBe(`https://render.carbone.io/template`);
+    expect(_fetchCalls[2][0]).toBe(`https://render.carbone.io/render/${_templateId}`);
+    expect(_fetchCalls[3][0]).toBe(`https://render.carbone.io/render/${_renderId}`);
+    expect(_fetchCalls.length).toBe(4);
     fetchMock.reset();
   });
 
   test("[error test] should throw because the template content is invalid", async function () {
+    fetchMock.post("https://render.carbone.io/render/e9b98135998afcefd4da38d000b284293e0f6c44abb17d2a31d8e1625e43eb21", { success: false })
     fetchMock.post("https://render.carbone.io/template", {
       success: false,
       error: "invalid file",
     });
     await expect(() =>
       _carboneSDK.render("Some invalid content", {})
-    ).rejects.toThrow("Carbone SDK render error: Something went wrong.");
+    ).rejects.toThrow("Carbone SDK render error: the rendering has failled.");
     fetchMock.reset();
   });
 
@@ -335,6 +381,9 @@ describe("Test render", function () {
     const _templateId =
       "20f36c2e4d1702a839ec001295696fa730a521d3afabed5f2ddc824c6897aea4";
     fetchMock.post(`https://render.carbone.io/render/${_templateId}`, {
+      success: false,
+    });
+    fetchMock.post(`https://render.carbone.io/render/07015dd3447d7e1467ce24d847983465f61629883a8b2dd9ff3348118d3c4c93`, {
       success: false,
     });
     fetchMock.post("https://render.carbone.io/template", {
@@ -360,16 +409,16 @@ describe("Test render", function () {
   });
 });
 
-describe("Test Calculate hash", function () {
+describe("Test Calculate hash templateId", function () {
   const _carboneSDK = carboneRenderSDK("Token1234");
-  test("should convert a file content into a templateId 1", async function () {
+  test("should convert a file content as string into a templateId 1", async function () {
     const _content = "<html>This is some content</html>";
     const _templateIdNode = global.generateTemplateIdFromNode(_content);
     const _templateId = await _carboneSDK.generateTemplateId(_content);
     expect(_templateId).toStrictEqual(_templateIdNode);
   });
 
-  test("should convert a file content into a templateId with a payload 2", async function () {
+  test("should convert a file content as string into a templateId with a payload 2", async function () {
     const _content = "<html>This is some content</html>";
     const _payload = "Payload1234";
     const _templateIdNode = global.generateTemplateIdFromNode(
@@ -383,7 +432,7 @@ describe("Test Calculate hash", function () {
     expect(_templateId).toStrictEqual(_templateIdNode);
   });
 
-  test("should convert a file content into a templateId 3 ", async function () {
+  test("should convert a file content as string into a templateId 3 ", async function () {
     const _content =
       "<html>This is some content {d.firstname} {d.lastname}</html>";
     const _templateIdNode = global.generateTemplateIdFromNode(_content);
@@ -391,11 +440,33 @@ describe("Test Calculate hash", function () {
     expect(_templateId).toStrictEqual(_templateIdNode);
   });
 
-  test("should convert a file content into a templateId with a payload 4", async function () {
+  test("should convert a file content as string into a templateId with a payload 4", async function () {
     const _content =
       "<html>This is some content {d.firstname} {d.lastname}</html>";
     const _payload =
       "Payload1234This is a long payload with different characters 1 *5 &*9 %$ 3%&@9 @(( 3992288282 29299 9299929";
+    const _templateIdNode = global.generateTemplateIdFromNode(
+      _content,
+      _payload
+    );
+    const _templateId = await _carboneSDK.generateTemplateId(
+      _content,
+      _payload
+    );
+    expect(_templateId).toStrictEqual(_templateIdNode);
+  });
+
+  test("should convert a file content as a buffer into a templateId 5 ", async function () {
+    const _content = new Buffer.from("<html>This is some content {d.firstname} {d.lastname}</html>");
+    const _templateIdNode = global.generateTemplateIdFromNode(_content);
+    const _templateId = await _carboneSDK.generateTemplateId(_content);
+    expect(_templateId).toStrictEqual(_templateIdNode);
+  });
+
+  test("should convert a file content as a buffer into a templateId with a payload 6", async function () {
+    const _content = new Buffer.from("<html>This is some content {d.firstname} {d.lastname}</html>");
+    const _payload =
+      new Buffer.from("Payload1234This is a long payload with different characters 1 *5 &*9 %$ 3%&@9 @(( 3992288282 29299 9299929");
     const _templateIdNode = global.generateTemplateIdFromNode(
       _content,
       _payload

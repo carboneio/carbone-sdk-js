@@ -141,29 +141,37 @@ const carboneRenderSDK = function (accessToken) {
       }
       if (_renderResponse === null || _renderResponse.success === false) {
         // 2 - if the report has already been uploaded: Generate the templateID from the content and render from the template id, if success false else try solution 3
-        // TODO
-        // 3 - add the template, and render
-        const _response = await this.addTemplate(templateIdOrFile, payload);
-        if (
-          _response &&
-          _response.success === true &&
-          _response.data.templateId
-        ) {
-          _renderResponse = await this.renderReport(
-            _response.data.templateId,
-            data
-          );
+        // if templateIdOrFile is a File or Blob, convert to uint8array - todo: test the uint8array conversion with JSDOM+JEST
+        const _fileContentBuffer = await (typeof templateIdOrFile === "string" ? templateIdOrFile : await templateIdOrFile.arrayBuffer().then(resp => new Uint8Array(resp)));
+        const _templateId = await this.generateTemplateId(_fileContentBuffer, payload);
+        if (_templateId) {
+          _renderResponse = await this.renderReport(_templateId, data);
+        }
+        if (_renderResponse === null || _renderResponse.success === false) {
+          // 3 - add the template, and render
+          const _response = await this.addTemplate(templateIdOrFile, payload);
+          if (
+            _response &&
+            _response.success === true &&
+            _response.data.templateId
+          ) {
+            _renderResponse = await this.renderReport(
+              _response.data.templateId,
+              data
+            );
+          }
         }
       }
-      if (_renderResponse === null) {
-        // Happen when the addTemplate return an error
-        throw new Error("Carbone SDK render error: Something went wrong.");
-      }
-      if (_renderResponse.success === false || !_renderResponse.data.renderId) {
+      if (!_renderResponse || _renderResponse.success === false || !_renderResponse.data.renderId) {
         throw new Error("Carbone SDK render error: the rendering has failled.");
       }
       return this.getReport(_renderResponse.data.renderId, responseType);
     },
+    /**
+     *
+     * @param {Buffer|Uint8Array|String} fileContent
+     * @param {Buffer|Uint8Array|String} payload
+     */
     generateTemplateId: async function (fileContent, payload = "") {
       function arrayBufferToHexa(buffer) {
         var digest = "";
@@ -182,11 +190,15 @@ const carboneRenderSDK = function (accessToken) {
         }
         return digest;
       }
-      var bufferContent = new TextEncoder("utf-8").encode(
-        payload + fileContent
-      );
+      // if string, convert to uint8array, else object === Blob or File
+      var bufferContent = typeof fileContent === "string" ? new TextEncoder("utf-8").encode(fileContent) : fileContent;
+      var bufferPayload = typeof payload === "string" ? new TextEncoder("utf-8").encode(payload) : payload;
+      // Merge payload and file content
+      var mergedArray = new Uint8Array(bufferPayload.length + bufferContent.length);
+      mergedArray.set(bufferPayload);
+      mergedArray.set(bufferContent, bufferPayload.length);
       return await crypto.subtle
-        .digest("SHA-256", bufferContent)
+        .digest("SHA-256", mergedArray)
         .then(function (hash) {
           return arrayBufferToHexa(hash);
         });
