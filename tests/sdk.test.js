@@ -101,11 +101,6 @@ describe("Test getTemplate", function () {
     const _response = await _carboneSDK.getTemplate("templateId1234", "text");
     expect(_response).toBe(_content);
     fetchMock.reset();
-    // var reader = new FileReader();
-    // reader.addEventListener("load", function(event) {
-    //   console.log("'load' event has been fired!");
-    // });
-    // reader.readAsText(value);
   });
 
   test("should get the template as a blob", async () => {
@@ -173,18 +168,18 @@ describe("Test renderReport", function () {
   });
 
   test("should render a report from a templateId and a dataset", async () => {
+    const _data = {data: { name: "john" }, exportTo: "pdf"}
     const _templateId =
       "f90e67221d7d5ee11058a000bdb997fb41bf149b1f88b45cb1aba9edcab8f868";
     const _renderId = "r3209jf903j2f90j2309fj3209fj";
     fetchMock.post(
       `https://render.carbone.io/render/${_templateId}`,
-      `{"success" : true,"error"   : null,"data": {"renderId": "` +
-        _renderId +
-        `"}}`
+      function (url, options) {
+        expect(JSON.parse(options.body)).toStrictEqual(_data);
+        return `{"success" : true,"error"   : null,"data": {"renderId": "` + _renderId + `"}}`;
+      }
     );
-    const _resp = await _carboneSDK.renderReport(_templateId, {
-      data: { name: "john" },
-    });
+    const _resp = await _carboneSDK.renderReport(_templateId, _data);
     expect(_resp.success).toStrictEqual(true);
     expect(_resp.error).toStrictEqual(null);
     expect(_resp.data.renderId).toStrictEqual(_renderId);
@@ -209,26 +204,36 @@ describe("Test getReport", function () {
   });
 
   test("should get the template as a text", async () => {
+    const _filename = "OIQWJDWQOI.html"
     const _content = "<html>This is the report content</html>";
     fetchMock.get("https://render.carbone.io/render/renderId4321", {
       body: _content,
+      headers: {
+        "content-disposition": `filename="${_filename}"`
+      }
     });
     const _response = await _carboneSDK.getReport("renderId4321", "text");
-    expect(_response).toBe(_content);
+    expect(_response.content).toBe(_content);
+    expect(_response.name).toBe(_filename);
     fetchMock.reset();
   });
 
   test("should get the template as a blob", async () => {
+    const _filename = "OIQWJDWQOI.xml"
     const _content = "<html>This is the report content</html>";
     fetchMock.get("https://render.carbone.io/render/renderId4321", {
       body: _content,
+      headers: {
+        "content-disposition": `filename="${_filename}"`
+      }
     });
     const _response = await _carboneSDK.getReport("renderId4321");
     // Convert blob to string
-    const _res = await _response.arrayBuffer().then((buf) => {
+    const _res = await _response.content.arrayBuffer().then((buf) => {
       return Buffer.from(buf).toString();
     });
     expect(_res).toBe(_content);
+    expect(_response.name).toBe(_filename);
     fetchMock.reset();
   });
 });
@@ -241,7 +246,7 @@ describe("Test render", function () {
     const _renderId = "renderId4321";
     const _fakeData = { data: { firstname: "John", age: "30" } };
     const _expectedContent = "<html>This is the report content</html>";
-
+    const _expectedFileName = "DWIQ982DWIQUH.xml";
     /** Mock Requests */
     fetchMock.post(
       `https://render.carbone.io/render/${_templateId}`,
@@ -251,17 +256,22 @@ describe("Test render", function () {
     );
     fetchMock.get(`https://render.carbone.io/render/${_renderId}`, {
       body: _expectedContent,
+      headers: {
+        "content-disposition": `filename="${_expectedFileName}"`
+      }
     });
+
     const _renderResponse = await _carboneSDK.render(
       _templateId,
       _fakeData,
       "text"
     );
     // Convert blob to string
-    const _resp = await _renderResponse.arrayBuffer().then((buf) => {
+    const _resp = await _renderResponse.content.arrayBuffer().then((buf) => {
       return Buffer.from(buf).toString();
     });
     expect(_resp).toBe(_expectedContent);
+    expect(_renderResponse.name).toBe(_expectedFileName);
     fetchMock.reset();
   });
 
@@ -277,6 +287,7 @@ describe("Test render", function () {
       .toString()
       .replace("{d.firstname}", _fakeData.data.firstname)
       .replace("{d.lastname}", _fakeData.data.lastname);
+    const _expectedFileName = "DWIQ982DWIQUH.xml";
     /** Mock request */
     fetchMock.post("https://render.carbone.io/template", {
       success: true,
@@ -290,18 +301,22 @@ describe("Test render", function () {
     );
     fetchMock.get(`https://render.carbone.io/render/${_renderId}`, {
       body: _expectedContent,
+      headers: {
+        "content-disposition": `filename="${_expectedFileName}"`
+      }
     });
 
-    const _respBlob = await _carboneSDK.render(
+    const _response = await _carboneSDK.render(
       data.toString(),
       _fakeData,
       "text"
     );
     // Convert blob to string
-    const _resp = await _respBlob.arrayBuffer().then((buf) => {
+    const _resp = await _response.content.arrayBuffer().then((buf) => {
       return Buffer.from(buf).toString();
     });
     expect(_resp).toStrictEqual(_expectedContent);
+    expect(_response.name).toStrictEqual(_expectedFileName);
     fetchMock.reset();
   });
 
@@ -390,5 +405,31 @@ describe("Test Calculate hash", function () {
       _payload
     );
     expect(_templateId).toStrictEqual(_templateIdNode);
+  });
+});
+
+describe("getReportNameFromHeader", () => {
+  const _carboneSDK = carboneRenderSDK("Token1234");
+  test("should parse the report file name on the header ", function() {
+    const _filename = "01EGN9TBHYTS3PVGRG6DCJC7HG.pdf"
+    const _headers = new Map();
+    _headers.set("content-disposition", `filename="${_filename}"`);
+    expect(_carboneSDK.getReportNameFromHeader(_headers)).toStrictEqual(_filename);
+  });
+  test("should parse the report file name (without double quotes) on the header ", function() {
+    const _filename = "01EGN9TBHYTS3PVGRG6DCJC7HG.pdf"
+    const _headers = new Map();
+    _headers.set("content-disposition", `filename=${_filename}`);
+    expect(_carboneSDK.getReportNameFromHeader(_headers)).toStrictEqual(_filename);
+  });
+  test("should not parse the report file name on the header and return null", function() {
+    const _headers = new Map();
+    _headers.set("content-disposition", `filename=`);
+    expect(_carboneSDK.getReportNameFromHeader(_headers)).toStrictEqual(null);
+    _headers.set("content-disposition", `filename`);
+    expect(_carboneSDK.getReportNameFromHeader(_headers)).toStrictEqual(null);
+    _headers.set("content-disposition", ``);
+    expect(_carboneSDK.getReportNameFromHeader(_headers)).toStrictEqual(null);
+    expect(_carboneSDK.getReportNameFromHeader()).toStrictEqual(null);
   });
 });

@@ -2,7 +2,7 @@
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000)
 [![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen.svg)](https://carbone.io/api-reference.html#carbone-sdk-javascript)
 
-> The javascript SDK to use Carbone Render easily into your frontend.
+> The javascript SDK to use Carbone Render easily into your frontend (Angular, Vuejs, Svelte, React, Ember.js...).
 
 Carbone is a report generator (PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV...) using templates and JSON data.
 [Learn more about the Carbone ecosystem](https://carbone.io/documentation.html).
@@ -19,7 +19,14 @@ npm install github.com/Ideolys/carbone-sdk-javascript
 
 ## Documentation
 
-- [API REFERENCE](./API-REFERENCE.md)
+- [API REFERENCE](./doc/API-REFERENCE.md)
+- [Basic integration example](./doc/index.example.html)
+
+## Build for production
+
+```bash
+$ npm run build
+```
 
 ## Run tests
 To run all the tests:

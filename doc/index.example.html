@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Carbone Render API example</title>
+  </head>
+  <body>
+    <h1>Carbone Render Javascript SDK Example</h1>
+
+    <h2> Configurations </h2>
+
+    <label for="accessToken">API access token</label><br/>
+    <input type="text" id="accessToken" placeholder="Api Access Token" name="accessToken" /> <span id="logToken"></span>
+
+    <h2>Add a template</h2>
+
+    <input type="file" id="templateInputAdd" name="template" />
+
+    <button onclick="addTemplate()">Upload</button> <span id="logAdd"></span>
+
+    <h2>Download a template</h2>
+
+    <input type="text" id="templateInputDownload" placeholder="template ID" />
+    <input type="text" id="templateInputDownloadFileName" placeholder="filename + extension" />
+    <button onclick="getTemplate()">Download</button> <span id="logGet"></span>
+
+    <h2>Delete a template</h2>
+
+    <input type="text" id="templateInputDelete" placeholder="template ID" />
+
+    <button onclick="deleteTemplate()">Delete</button> <span id="logDelete"></span>
+
+    <h2>Render a report</h2>
+    <input type="text" id="templateInputRender" placeholder="template ID" /><br/>
+    <textarea name="jsondata" id="templateInputRenderData" cols="30" rows="10" ></textarea> <br/>
+    <button onclick="renderReport()">Render and Download the report</button><span id="logRender"></span>
+
+    <script src="../src/main.js"></script>
+    <script>
+
+      document.getElementById("templateInputRenderData").innerHTML = `{
+"data" :{
+  "firstname":"Steeve",
+  "lastname": "pay"
+},
+"convertTo": "pdf"
+}`
+      function getCarboneService() {
+        const _token = getAccessToken();
+        if (!_token) {
+          return null;
+        }
+        const carboneService = window.carboneRenderSDK(_token);
+        carboneService.setApiUrl("http://localhost:3000");
+        return carboneService;
+      }
+
+      async function addTemplate() {
+        const carboneService = getCarboneService();
+        if (!carboneService) {
+          return;
+        }
+        if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
+          document.getElementById("logAdd").innerHTML = "The File APIs are not fully supported in this browser.";
+          return;
+        }
+        var input = document.getElementById("templateInputAdd");
+        if (!input) {
+          document.getElementById("logAdd").innerHTML = "Um, couldn't find the fileinput element.";
+        } else if (!input.files) {
+          document.getElementById("logAdd").innerHTML = "This browser doesn't seem to support the `files` property of file inputs.";
+        } else if (!input.files[0]) {
+          document.getElementById("logAdd").innerHTML = "Please select a file before clicking 'Upload'";
+        } else {
+          var file = input.files[0];
+          carboneService.addTemplate(file, "").then(data => {
+            if (data.success === true) {
+              document.getElementById("templateInputDelete").value = data.data.templateId;
+              document.getElementById("templateInputRender").value = data.data.templateId;
+              document.getElementById("templateInputDownload").value = data.data.templateId;
+              document.getElementById("logAdd").innerHTML = "templateId: " + data.data.templateId;
+            } else {
+              document.getElementById("logAdd").innerHTML = "addTemplate error: something went wrong" + data.error;
+            }
+          });
+        }
+      }
+
+      function deleteTemplate() {
+        const carboneService = getCarboneService();
+        if (!carboneService) {
+          return;
+        }
+        const _templateID = document.getElementById("templateInputDelete").value;
+        document.getElementById("logDelete").innerHTML = "";
+        if (!_templateID) {
+          console.error("The template ID is not specified");
+          document.getElementById("logDelete").innerHTML = "The template ID is not specified";
+          return;
+        }
+        carboneService.deleteTemplate(_templateID).then(res => {
+          if (res.success === true) {
+            document.getElementById("logDelete").innerHTML = "success";
+          } else {
+            document.getElementById("logDelete").innerHTML = "something went wrong: " + res.error;
+          }
+        });
+      }
+
+      function getTemplate() {
+        const carboneService = getCarboneService();
+        if (!carboneService) {
+          return;
+        }
+        const _templateID = document.getElementById("templateInputDownload").value;
+        document.getElementById("logGet").innerHTML = "";
+        if (!_templateID) {
+          document.getElementById("logGet").innerHTML = "The template ID is not specified";
+          return;
+        }
+        const _templateName = document.getElementById("templateInputDownloadFileName").value;
+        if (!_templateName) {
+          document.getElementById("logGet").innerHTML = "The template Name is not specified";
+          return;
+        }
+        carboneService.getTemplate(_templateID).then(resp => {
+          download(resp, _templateName);
+          document.getElementById("logGet").innerHTML = "done";
+        });
+      }
+
+      function renderReport() {
+        const carboneService = getCarboneService();
+        if (!carboneService) {
+          return;
+        }
+        document.getElementById("logRender").innerHTML = "";
+        const _templateID = document.getElementById("templateInputRender").value.trim();
+        if (!_templateID) {
+          document.getElementById("logRender").innerHTML = "The template ID is not specified";
+          return;
+        }
+        let _data = document.getElementById("templateInputRenderData").value.trim();
+        if (!_data) {
+          document.getElementById("logRender").innerHTML = "The data as JSON is not specified";
+          return;
+        }
+        _data = JSON.parse(_data);
+
+        carboneService.render(_templateID, _data).then(resp => {
+          console.log(resp);
+          download(resp.content, resp.name);
+          document.getElementById("logRender").innerHTML = "done";
+        });
+      }
+
+      function getAccessToken () {
+        document.getElementById("logToken").innerHTML = ""
+        const _token = document.getElementById("accessToken").value;
+        if (!_token) {
+          console.error("The access token is required!");
+          document.getElementById("logToken").innerHTML = "<b style='color:red'>The access token is required!</b>";
+          return null;
+        }
+        return _token;
+      }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js" integrity="sha512-WiGQZv8WpmQVRUFXZywo7pHIO0G/o3RyiAJZj8YXNN4AV7ReR1RYWVmZJ6y3H06blPcjJmG/sBpOVZjTSFFlzQ==" crossorigin="anonymous"></script>
+  </body>
+</html>

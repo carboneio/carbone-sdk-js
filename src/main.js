@@ -57,14 +57,11 @@ const carboneRenderSDK = function (accessToken) {
       });
       return await response.json();
     },
-    getTemplate: async function (templateId, responseType) {
+    getTemplate: async function (templateId, responseType = "blob") {
       if (!templateId) {
         throw new Error(
           "Carbone SDK getTemplate error: the templateId argument is not valid."
         );
-      }
-      if (!responseType) {
-        responseType = "blob";
       }
       if (["blob", "text"].indexOf(responseType) === -1) {
         throw new Error(
@@ -93,10 +90,7 @@ const carboneRenderSDK = function (accessToken) {
       }
       const response = await fetch(`${_config.apiUrl}/render/${templateId}`, {
         method: "post",
-        body: JSON.stringify({
-          data: data,
-          convertTo: "odt",
-        }),
+        body: JSON.stringify(data),
         headers: {
           "Content-type": "application/json",
           "carbone-version": _config.apiVersion,
@@ -105,14 +99,11 @@ const carboneRenderSDK = function (accessToken) {
       });
       return await response.json();
     },
-    getReport: async function (renderId, responseType) {
+    getReport: async function (renderId, responseType = "blob") {
       if (!renderId) {
         throw new Error(
           "Carbone SDK getReport error: the renderId argument is not valid."
         );
-      }
-      if (!responseType) {
-        responseType = "blob";
       }
       if (["blob", "text"].indexOf(responseType) === -1) {
         throw new Error(
@@ -123,12 +114,12 @@ const carboneRenderSDK = function (accessToken) {
         method: "get",
         headers: {
           "carbone-version": _config.apiVersion,
-          Authorization: "Bearer " + _config.accessToken,
+          Authorization: "Bearer " + _config.accessToken
         },
       });
-      return await response[responseType]();
+      return { content: await response[responseType](), name: this.getReportNameFromHeader(response.headers) };
     },
-    render: async function (templateIdOrFile, data, payload, responseType) {
+    render: async function (templateIdOrFile, data, payload = "", responseType = "blob") {
       if (!templateIdOrFile) {
         throw new Error(
           "Carbone SDK render error: the templateId argument is not valid."
@@ -138,9 +129,6 @@ const carboneRenderSDK = function (accessToken) {
         throw new Error(
           "Carbone SDK render error: the data argument is not valid."
         );
-      }
-      if (!payload) {
-        payload = "";
       }
       let _renderResponse = null;
       // 1 - if template ID, try to render the report, if return false, try 2
@@ -202,6 +190,24 @@ const carboneRenderSDK = function (accessToken) {
           return arrayBufferToHexa(hash);
         });
     },
+    getReportNameFromHeader(headers) {
+      if (!headers) {
+        return null;
+      }
+      const _contentHeader = headers.get("content-disposition");
+      if (!_contentHeader) {
+        return null;
+      }
+      let splitted = _contentHeader.split('=')
+      if (splitted.length === 1 || !splitted[1]) {
+        return null;
+      }
+      let _reportName = splitted[1];
+      if (_reportName[0] === "\"" && _reportName[_reportName.length -1] === "\"") {
+        _reportName = _reportName.substr(1, splitted[1].length - 2);
+      }
+      return _reportName
+    }
   };
 };
 
