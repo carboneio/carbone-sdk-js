@@ -23,7 +23,7 @@ const carboneRenderSDK = function (accessToken) {
     setApiUrl: function (url) {
       _config.apiUrl = url;
     },
-    addTemplate: async function (file, payload) {
+    addTemplate: async function (file, payload = '') {
       var form = new FormData();
       if (!file) {
         throw new Error(

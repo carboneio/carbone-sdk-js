@@ -15,12 +15,27 @@ npm install github.com/Ideolys/carbone-sdk-javascript
 
 ## Usage
 
-// WIP
+```js
+  // SDK constructor, the access token have to be passed as an argument to carboneRenderSDK
+  const _carboneService = window.carboneRenderSDK("eyJhbGc...");
+  // Template from a file input OR template ID
+  const _template = document.getElementById("inputFile").files[0];
+  // Data from an input
+  let _data = JSON.parse(document.getElementById("inputData").value);
+  // Render the report from a template and a JSON Data
+  _carboneService.render(_template, _data).then(({ content, name }) => {
+    // name == report name as a String
+    // content == report content as a Blob, it can be used to download the file
+  });
+```
+***[Checkout an integration example.](./doc/index.render.example.html)***
 
 ## Documentation
 
-- [API REFERENCE](./doc/API-REFERENCE.md)
-- [Integration example](./doc/index.example.html)
+- [SDK API REFERENCE](./doc/API-REFERENCE.md)
+- [SDK quick integration example](./doc/index.render.example.html)
+- [SDK full integration example](./doc/index.full.example.html)
+- [Documentation to design a template](https://carbone.io/documentation.html#building-a-template)
 
 ## Build for production
 

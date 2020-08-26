@@ -74,6 +74,7 @@
           document.getElementById("logAdd").innerHTML = "Please select a file before clicking 'Upload'";
         } else {
           var file = input.files[0];
+          console.log(file);
           carboneService.addTemplate(file, "").then(data => {
             if (data.success === true) {
               document.getElementById("templateInputDelete").value = data.data.templateId;

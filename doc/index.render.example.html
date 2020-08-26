@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Render</title>
+</head>
+<body>
+  <h1>Quick start JavaScript Carbone SDK</h1>
+  <input type="file" id="inputFile" name="template" /><br/>
+  <textarea name="data" id="inputData" cols="30" rows="10" ></textarea><br/>
+  <button onclick="render()">Render report and download</button> <span id="logAdd"></span>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js" integrity="sha512-WiGQZv8WpmQVRUFXZywo7pHIO0G/o3RyiAJZj8YXNN4AV7ReR1RYWVmZJ6y3H06blPcjJmG/sBpOVZjTSFFlzQ==" crossorigin="anonymous"></script>
+  <script src="../src/main.js"></script>
+
+  <script>
+    const _carboneService = window.carboneRenderSDK("eyJhbGciOiJFUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIxIiwiYXVkIjoiY2FyYm9uZSIsImV4cCI6MjIyODA0NTQ4MiwiZGF0YSI6eyJpZEFjY291bnQiOjF9fQ.AV22XpEFkJwJE8MOnKzW5kTcF-clACxutxprgwYEcEDQ24udGuU7hdufODSKtxBpzHyugpckFk1i9bgw3CsSXj-iAckQ_zNv4PVi1F0qfpXsPolYQhbEui3qrahj6RP3LY2rA4QCSo5UT43aYjYbgDHqHN-McOZG_tlO17MJFcuYNw7z");
+
+    function render() {
+      // Template from a file input OR template ID
+      const _template = document.getElementById("inputFile").files[0];
+      // Data from an input, for example: {"data" :{"firstname":"John","lastname":"Wick"},"convertTo":"pdf"}
+      let _data = JSON.parse(document.getElementById("inputData").value);
+      // Render the report from a template and a JSON Data
+      _carboneService.render(_template, _data).then(({ content, name }) => {
+        // download.js is used to download the file
+        download(content, name);
+      });
+    }
+  </script>
+
+</body>
+</html>
