@@ -134,7 +134,8 @@ const carboneRenderSDK = function (accessToken) {
       // 1 - if template ID, try to render the report, if return false, try 2
       if (
         typeof templateIdOrFile === "string" &&
-        templateIdOrFile.length === 64
+        templateIdOrFile.length === 64 &&
+        Object.prototype.hasOwnProperty.call(templateIdOrFile, "name") === false
       ) {
         _renderResponse = await this.renderReport(templateIdOrFile, data);
       }
