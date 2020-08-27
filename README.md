@@ -61,7 +61,7 @@ $ node ./tests/generate_template_id.js
 
 Contributions, issues and feature requests are welcome!
 
-Feel free to check [issues page](https://github.com/Ideolys/carbone-sdk-go/issues).
+Feel free to check [issues page](https://github.com/Ideolys/carbone-sdk-js/issues).
 
 ## Show your support
 
