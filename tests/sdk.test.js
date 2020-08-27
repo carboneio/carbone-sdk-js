@@ -1,13 +1,16 @@
 /* eslint-disable no-undef */
-require("../src/main.js");
+const carboneRenderSDK = require("../src/main.js");
 var fs = require("fs");
 const fetchMock = require("fetch-mock-jest");
 
-// `global` jest === `document.window`
-const carboneRenderSDK = global.carboneRenderSDK;
-
 describe("Tests configurations", function () {
   const _carboneSDK = carboneRenderSDK("Token1234");
+  test("should define a new instance from the global window variable", () => {
+    // jest global === document.window
+    const _sdk = global.carboneRenderSDK("Lala");
+    expect(_sdk.getAccessToken()).toStrictEqual("Lala");
+  });
+
   test("should define and get the access token, api version and apiUrl", () => {
     expect(_carboneSDK.getAccessToken()).toBe("Token1234");
     expect(_carboneSDK.getApiUrl()).toBe("https://render.carbone.io");

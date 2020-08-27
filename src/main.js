@@ -1,3 +1,8 @@
+/**
+ * @description Carbone Render SDK Constructor, the access token have to be passed as the first parameter.
+ *
+ * @param {String} accessToken
+ */
 const carboneRenderSDK = function (accessToken) {
   const _config = {
     apiUrl: "https://render.carbone.io",
@@ -5,24 +10,48 @@ const carboneRenderSDK = function (accessToken) {
     apiVersion: 2,
   };
   return {
+    /**
+     * @returns {String} Return the access token
+     */
     getAccessToken: function () {
       return _config.accessToken;
     },
+    /**
+     * @param {String} newToken Set a new access token
+     */
     setAccessToken: function (newToken) {
       _config.accessToken = newToken;
     },
+    /**
+     * @returns {String|Number} Return the Carbone API version
+     */
     getApiVersion: function () {
       return _config.apiVersion;
     },
+    /**
+     * @param {String|Number} version Set the Carbone API version
+     */
     setApiVersion: function (version) {
       _config.apiVersion = version;
     },
+    /**
+     * @returns {String} Return the Carbone API URL
+     */
     getApiUrl: function () {
       return _config.apiUrl;
     },
+    /**
+     * @param {String} url Set the Carbone API URL
+     */
     setApiUrl: function (url) {
       _config.apiUrl = url;
     },
+    /**
+     * @description Add a template asynchronously to the Carbone Render API
+     * @param {File|Blob|String} file File from a form or Blob
+     * @param {String} payload Payload to get a different template ID
+     * @returns {Promise<Object>} A templateId is return otherwise an error
+     */
     addTemplate: async function (file, payload = '') {
       var form = new FormData();
       if (!file) {
@@ -42,6 +71,11 @@ const carboneRenderSDK = function (accessToken) {
       });
       return await response.json();
     },
+    /**
+     * @description Delete a template asynchronously
+     * @param {String} templateId
+     * @returns {Promise<Object>} Object response with a success or error message.
+     */
     deleteTemplate: async function (templateId) {
       if (!templateId) {
         throw new Error(
@@ -57,6 +91,12 @@ const carboneRenderSDK = function (accessToken) {
       });
       return await response.json();
     },
+    /**
+     * @description Return a template asynchronously as a blob from a templateId.
+     * @param {String} templateId
+     * @param {String} responseType It can be a "blob" or "text". Blob by default.
+     * @returns {Promise<Blob|String>} The template as a Blob or Text.
+     */
     getTemplate: async function (templateId, responseType = "blob") {
       if (!templateId) {
         throw new Error(
@@ -77,6 +117,12 @@ const carboneRenderSDK = function (accessToken) {
       });
       return await response[responseType]();
     },
+    /**
+     * @description Render a report asynchronously from a templateID and return a renderId
+     * @param {String} templateId
+     * @param {Object} data the dataset
+     * @returns {Promise<Object>} Return the API response with a renderId. If something went wrong, it returns an error.
+     */
     renderReport: async function (templateId, data) {
       if (!templateId) {
         throw new Error(
@@ -99,6 +145,12 @@ const carboneRenderSDK = function (accessToken) {
       });
       return await response.json();
     },
+    /**
+     * @description Return a report as a Blob asynchronously from renderId.
+     * @param {String} renderId
+     * @param {String} responseType It can be a "blob" or "text". Blob by default.
+     * @returns {Promise<Blob|String>} The report as a Blob or Text.
+     */
     getReport: async function (renderId, responseType = "blob") {
       if (!renderId) {
         throw new Error(
@@ -119,6 +171,18 @@ const carboneRenderSDK = function (accessToken) {
       });
       return { content: await response[responseType](), name: this.getReportNameFromHeader(response.headers) };
     },
+    /**
+     * @description The render function can be use to render reports
+     * @description 1 - If it receive a template ID, try to render the report
+     * @description 2 - if it is a File or Blob and the template has already been uploaded: it generates the templateID locally from the content and try render from the template id
+     * @description 3 - if it is a File or Blob and the template has not been uploaded: it uploads the template and render the report.
+     *
+     * @param {Blob|File|String} templateIdOrFile Template ID (refering to a template already uploaded) or File/Blob template to upload
+     * @param {Object} data dataset
+     * @param {String} payload payload to get a different template Id
+     * @param {String} responseType It can be a "blob" or "text". Blob by default.
+     * @returns {Promise<Blob|String>} The report as a Blob or Text.
+     */
     render: async function (templateIdOrFile, data, payload = "", responseType = "blob") {
       if (!templateIdOrFile) {
         throw new Error(
@@ -168,9 +232,11 @@ const carboneRenderSDK = function (accessToken) {
       return this.getReport(_renderResponse.data.renderId, responseType);
     },
     /**
+     * @description Generate the template ID from the content pass as parameters.
      *
      * @param {Buffer|Uint8Array|String} fileContent
      * @param {Buffer|Uint8Array|String} payload
+     * @returns {String} The template ID
      */
     generateTemplateId: async function (fileContent, payload = "") {
       function arrayBufferToHexa(buffer) {
@@ -203,6 +269,11 @@ const carboneRenderSDK = function (accessToken) {
           return arrayBufferToHexa(hash);
         });
     },
+    /**
+     * @description Parse an retrieve the final unique report name in the "content-disposition" header during a "getReport" request.
+     * @param {Object} headers headers from a fetch request
+     * @returns {String} The report name
+     */
     getReportNameFromHeader(headers) {
       if (!headers) {
         return null;
@@ -225,3 +296,5 @@ const carboneRenderSDK = function (accessToken) {
 };
 
 window.carboneRenderSDK = carboneRenderSDK;
+// eslint-disable-next-line no-undef
+module.exports = carboneRenderSDK;
