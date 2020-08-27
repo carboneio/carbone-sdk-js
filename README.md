@@ -39,9 +39,13 @@ npm install github.com/Ideolys/carbone-sdk-javascript
 
 ## Build for production
 
+To edit build options, look at the file ["build.js"](./bin/build.js) for more details.
+
 ```bash
 $ npm run build
 ```
+
+After running the command, the script is available on the folder "dist".
 
 ## Run tests
 To run all the tests:
