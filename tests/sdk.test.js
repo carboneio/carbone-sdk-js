@@ -1,6 +1,6 @@
 import "core-js/stable";
 import "regenerator-runtime/runtime";
-import carboneSDK from "../dist/main.js";
+import carboneSDK from "../src/main.js";
 var fs = require("fs");
 const fetchMock = require("fetch-mock-jest");
 
