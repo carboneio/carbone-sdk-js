@@ -1,3 +1,5 @@
+### v1.1.1
+  - Fix project name & update documentation
 ### v1.1.0
   - Turn the SDK into a javascript module. The build script creates an ESM file. Instead of accessing the SDK globally through the "window.carboneRenderSDK", it is possible to import it through: `import carboneRenderSDK from "carbone-sdk-js"`
   - Update the default value of "version", so that, it requests the latest version 3 of Carbone
