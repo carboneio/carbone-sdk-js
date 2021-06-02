@@ -10,7 +10,13 @@ Carbone is a report generator (PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV...) usi
 ## Install
 
 ```sh
-npm install github.com/Ideolys/carbone-sdk-javascript
+npm install github.com/Ideolys/carbone-sdk-js
+```
+
+or 
+
+```sh
+yarn add https://github.com/Ideolys/carbone-sdk-js
 ```
 
 ## Usage
