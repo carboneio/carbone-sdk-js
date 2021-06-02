@@ -3,11 +3,11 @@
  *
  * @param {String} accessToken
  */
-const carboneRenderSDK = function (accessToken) {
+const carboneSDK = function (accessToken) {
   const _config = {
     apiUrl: "https://render.carbone.io",
     accessToken: accessToken,
-    apiVersion: 2,
+    apiVersion: 3,
   };
   return {
     /**
@@ -149,7 +149,7 @@ const carboneRenderSDK = function (accessToken) {
      * @description Return a report as a Blob asynchronously from renderId.
      * @param {String} renderId
      * @param {String} responseType It can be a "blob" or "text". Blob by default.
-     * @returns {Promise<Blob|String>} The report as a Blob or Text.
+     * @returns {Promise<{content: Blob|String, name: String}>} A object {content, name} where content is the report as a Blob by default and name is a unique report name as a string.
      */
     getReport: async function (renderId, responseType = "blob") {
       if (!renderId) {
@@ -181,7 +181,7 @@ const carboneRenderSDK = function (accessToken) {
      * @param {Object} data dataset
      * @param {String} payload payload to get a different template Id
      * @param {String} responseType It can be a "blob" or "text". Blob by default.
-     * @returns {Promise<Blob|String>} The report as a Blob or Text.
+     * @returns {Promise<{content: Blob|String, name: String}>} The report as a Blob or Text and it's name.
      */
     render: async function (templateIdOrFile, data, payload = "", responseType = "blob") {
       if (!templateIdOrFile) {
@@ -295,6 +295,7 @@ const carboneRenderSDK = function (accessToken) {
   };
 };
 
-window.carboneRenderSDK = carboneRenderSDK;
-// eslint-disable-next-line no-undef
-module.exports = carboneRenderSDK;
+/** Compatibility v1 */
+window.carboneRenderSDK = carboneSDK;
+window.carboneSDK = carboneSDK;
+export default carboneSDK;

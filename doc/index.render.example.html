@@ -7,28 +7,65 @@
 </head>
 <body>
   <h1>Quick start JavaScript Carbone SDK</h1>
+
+  <h2> 1. Configurations </h2>
+
+  <label for="accessToken">API access token</label><br/>
+  <input type="text" id="accessToken" placeholder="Api Access Token" name="accessToken" /> <span id="logToken"></span>
+
+
+  <h2> 2. Select a template</h2>
   <input type="file" id="inputFile" name="template" /><br/>
+  <h2> 3. Edit the JSON dataset</h2>
   <textarea name="data" id="inputData" cols="30" rows="10" ></textarea><br/>
+  <h2> 4. Render and download</h2>
   <button onclick="render()">Render report and download</button> <span id="logAdd"></span>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js" integrity="sha512-WiGQZv8WpmQVRUFXZywo7pHIO0G/o3RyiAJZj8YXNN4AV7ReR1RYWVmZJ6y3H06blPcjJmG/sBpOVZjTSFFlzQ==" crossorigin="anonymous"></script>
-  <script src="../src/main.js"></script>
 
-  <script>
-    // SDK constructor, the access token have to be passed as an argument to carboneRenderSDK
-    const _carboneService = window.carboneRenderSDK("eyJhbGciOiJFUz...");
+  <script type="module">
+
+    import carboneRenderSDK from "../dist/main.js";
+
+    document.getElementById("inputData").innerHTML = `
+    {
+      "data" :{
+        "firstname":"John",
+        "lastname": "Wick"
+      },
+      "convertTo": "pdf"
+    }`
 
     function render() {
+      const _token = getAccessToken();
+      if (!_token) {
+        return null;
+      }
+      // SDK constructor, the access token have to be passed as an argument to carboneRenderSDK
+      const carboneService = carboneRenderSDK(_token);
       // Template from a file input OR template ID
       const _template = document.getElementById("inputFile").files[0];
       // Data from an input, for example: {"data" :{"firstname":"John","lastname":"Wick"},"convertTo":"pdf"}
       let _data = JSON.parse(document.getElementById("inputData").value);
       // Render the report from a template and a JSON Data
-      _carboneService.render(_template, _data).then(({ content, name }) => {
+      carboneService.render(_template, _data).then(({ content, name }) => {
         // download.js is used to download the file
         download(content, name);
       });
     }
+
+    function getAccessToken () {
+        document.getElementById("logToken").innerHTML = ""
+        const _token = document.getElementById("accessToken").value;
+        if (!_token) {
+          console.error("The access token is required!");
+          document.getElementById("logToken").innerHTML = "<b style='color:red'>The access token is required!</b>";
+          return null;
+        }
+        return _token;
+      }
+
+    window.render = render;
   </script>
 
 </body>

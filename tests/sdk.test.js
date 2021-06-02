@@ -1,20 +1,28 @@
-/* eslint-disable no-undef */
-const carboneRenderSDK = require("../src/main.js");
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+import carboneSDK from "../dist/main.js";
 var fs = require("fs");
 const fetchMock = require("fetch-mock-jest");
 
 describe("Tests configurations", function () {
-  const _carboneSDK = carboneRenderSDK("Token1234");
-  test("should define a new instance from the global window variable", () => {
+  const _carboneSDK = carboneSDK("Token1234");
+  test("should define a new instance from the global window variable (v1.0.0 carboneRenderSDK)", () => {
     // jest global === document.window
     const _sdk = global.carboneRenderSDK("Lala");
     expect(_sdk.getAccessToken()).toStrictEqual("Lala");
   });
 
+  test("should define a new instance from the global window variable (v1.1.0 carboneSDK)", () => {
+    // jest global === document.window
+    const _sdk = global.carboneSDK("Lala");
+    expect(_sdk.getAccessToken()).toStrictEqual("Lala");
+  });
+
+
   test("should define and get the access token, api version and apiUrl", () => {
     expect(_carboneSDK.getAccessToken()).toBe("Token1234");
     expect(_carboneSDK.getApiUrl()).toBe("https://render.carbone.io");
-    expect(_carboneSDK.getApiVersion()).toBe(2);
+    expect(_carboneSDK.getApiVersion()).toBe(3);
   });
   test("should update and get the access token", () => {
     _carboneSDK.setAccessToken("Hello4321");
@@ -31,7 +39,7 @@ describe("Tests configurations", function () {
 });
 
 describe("Test addTemplate", function () {
-  const _carboneSDK = carboneRenderSDK("Token1234");
+  const _carboneSDK = carboneSDK("Token1234");
   test("should throw an error if the file argument is missing", async () => {
     await expect(() => _carboneSDK.addTemplate()).rejects.toThrow(
       "Carbone SDK addTemplate error: the file argument is not valid."
@@ -81,7 +89,7 @@ describe("Test addTemplate", function () {
 });
 
 describe("Test getTemplate", function () {
-  const _carboneSDK = carboneRenderSDK("Token1234");
+  const _carboneSDK = carboneSDK("Token1234");
   test("should throw an error if the templateId is missing", async () => {
     await expect(() => _carboneSDK.getTemplate()).rejects.toThrow(
       "Carbone SDK getTemplate error: the templateId argument is not valid."
@@ -123,7 +131,7 @@ describe("Test getTemplate", function () {
 });
 
 describe("Test deleteTemplate", function () {
-  const _carboneSDK = carboneRenderSDK("Token1234");
+  const _carboneSDK = carboneSDK("Token1234");
   test("should throw an error if the templateId is missing", async () => {
     await expect(() => _carboneSDK.deleteTemplate()).rejects.toThrow(
       "Carbone SDK deleteTemplate error: the templateId argument is not valid."
@@ -157,7 +165,7 @@ describe("Test deleteTemplate", function () {
 });
 
 describe("Test renderReport", function () {
-  const _carboneSDK = carboneRenderSDK("Token1234");
+  const _carboneSDK = carboneSDK("Token1234");
   test("should throw an error if the templateId is missing", async () => {
     await expect(() => _carboneSDK.renderReport()).rejects.toThrow(
       "Carbone SDK renderReport error: the templateId argument is not valid."
@@ -191,7 +199,7 @@ describe("Test renderReport", function () {
 });
 
 describe("Test getReport", function () {
-  const _carboneSDK = carboneRenderSDK("Token1234");
+  const _carboneSDK = carboneSDK("Token1234");
   test("should throw an error if the reportId is missing", async () => {
     await expect(() => _carboneSDK.getReport()).rejects.toThrow(
       "Carbone SDK getReport error: the renderId argument is not valid."
@@ -242,7 +250,7 @@ describe("Test getReport", function () {
 });
 
 describe("Test render", function () {
-  const _carboneSDK = carboneRenderSDK("Token1234");
+  const _carboneSDK = carboneSDK("Token1234");
   test("should render a report from an existing templateID (use only renderReport method) [Case 1]", async function () {
     const _templateId =
       "20f36c2e4d1702a839ec001295696fa730a521d3afabed5f2ddc824c6897aea4";
@@ -413,7 +421,7 @@ describe("Test render", function () {
 });
 
 describe("Test Calculate hash templateId", function () {
-  const _carboneSDK = carboneRenderSDK("Token1234");
+  const _carboneSDK = carboneSDK("Token1234");
   test("should convert a file content as string into a templateId 1", async function () {
     const _content = "<html>This is some content</html>";
     const _templateIdNode = global.generateTemplateIdFromNode(_content);
@@ -483,7 +491,7 @@ describe("Test Calculate hash templateId", function () {
 });
 
 describe("getReportNameFromHeader", () => {
-  const _carboneSDK = carboneRenderSDK("Token1234");
+  const _carboneSDK = carboneSDK("Token1234");
   test("should parse the report file name on the header ", function() {
     const _filename = "01EGN9TBHYTS3PVGRG6DCJC7HG.pdf"
     const _headers = new Map();

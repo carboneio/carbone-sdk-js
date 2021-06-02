@@ -36,8 +36,9 @@
     <textarea name="jsondata" id="templateInputRenderData" cols="30" rows="10" ></textarea> <br/>
     <button onclick="renderReport()">Render and Download the report</button><span id="logRender"></span>
 
-    <script src="../src/main.js"></script>
-    <script>
+    <script type="module">
+
+      import carboneRenderSDK from "../dist/main.js";
 
       document.getElementById("templateInputRenderData").innerHTML = `{
 "data" :{
@@ -51,8 +52,8 @@
         if (!_token) {
           return null;
         }
-        const carboneService = window.carboneRenderSDK(_token);
-        carboneService.setApiUrl("http://localhost:3000");
+        const carboneService = carboneRenderSDK(_token);
+        carboneService.setApiUrl("https://render.carbone.io");
         return carboneService;
       }
 
@@ -166,6 +167,12 @@
         }
         return _token;
       }
+
+      window.addTemplate = addTemplate;
+      window.deleteTemplate = deleteTemplate;
+      window.getTemplate = getTemplate;
+      window.renderReport = renderReport;
+      window.getAccessToken = getAccessToken;
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js" integrity="sha512-WiGQZv8WpmQVRUFXZywo7pHIO0G/o3RyiAJZj8YXNN4AV7ReR1RYWVmZJ6y3H06blPcjJmG/sBpOVZjTSFFlzQ==" crossorigin="anonymous"></script>
   </body>

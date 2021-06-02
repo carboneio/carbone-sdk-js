@@ -5,16 +5,22 @@ The Carbone Javascript SDK provides a simple interface to communicate with Carbo
 ## Install the Javascript SDK
 
 ```sh
-$ npm install github.com/Ideolys/carbone-sdk-javascript
+$ npm install github.com/Ideolys/carbone-sdk-js
 ```
+or
+```sh
+yarn add https://github.com/Ideolys/carbone-sdk-js
+```
+
 
 ## Quickstart with the Javascript SDK
 
 Try the following code to render a report in 10 seconds. Just replace your API key, the template you want to render (file input), and the data object.
 
 ```javascript
-// SDK constructor with the api access token
-const _carboneService = window.carboneRenderSDK("eyJhbGc...");
+import carboneSDK from "carbone-sdk-js";
+// SDK constructor, the access token have to be passed as an argument to carboneRenderSDK
+const _carboneService = carboneSDK("eyJhbGc...");
 // Template from a file input OR template ID
 const _template = document.getElementById("inputFile").files[0];
 // Data from an input, for example: {"data" :{"firstname":"John","lastname":"Wick"},"convertTo":"pdf"}
@@ -30,11 +36,18 @@ _carboneService.render(_template, _data).then(({ content, name }) => {
 
 ### CarboneSDK Constructor
 
-The SDK is available through the global `window` variable.
+Instanciate the SDK with:
+```javascript
+import carboneSDK from "carbone-sdk-js";
+// SDK constructor, the access token have to be passed as an argument to carboneRenderSDK
+const _carboneService = carboneSDK("eyJhbGc...");
+```
+
+Or, the SDK is available through the global `window` variable.
 
 ```javascript
 // Carbone access token passed as parameter
-const _carboneService = window.carboneRenderSDK("eyJhbGc...");
+const _carboneService = window.carboneSDK("eyJhbGc...");
 ```
 ### Render
 

@@ -13,7 +13,7 @@ Carbone is a report generator (PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV...) usi
 npm install github.com/Ideolys/carbone-sdk-js
 ```
 
-or 
+or
 
 ```sh
 yarn add https://github.com/Ideolys/carbone-sdk-js
@@ -22,8 +22,9 @@ yarn add https://github.com/Ideolys/carbone-sdk-js
 ## Usage
 
 ```js
+  import carboneSDK from "carbone-sdk-js";
   // SDK constructor, the access token have to be passed as an argument to carboneRenderSDK
-  const _carboneService = window.carboneRenderSDK("eyJhbGc...");
+  const _carboneService = carboneSDK("eyJhbGc...");
   // Template from a file input OR template ID
   const _template = document.getElementById("inputFile").files[0];
   // Data from an input
@@ -54,6 +55,10 @@ $ npm run build
 After running the command, the script is available on the folder "dist".
 
 ## Run tests
+Build the project
+```bash
+$ npm run build
+```
 To run all the tests:
 ```bash
 $ npm run test
