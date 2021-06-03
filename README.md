@@ -1,5 +1,5 @@
 # Carbone Render Javascript SDK
-![Version](https://img.shields.io/badge/version-1.1.3-blue.svg?cacheSeconds=2592000)
+![Version](https://img.shields.io/badge/version-1.1.4-blue.svg?cacheSeconds=2592000)
 [![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen.svg)](./doc/API-REFERENCE.md)
 
 > The javascript SDK to use Carbone Render easily into your frontend (Angular, Vuejs, Svelte, React, Ember.js...).

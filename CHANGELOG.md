@@ -1,3 +1,5 @@
+### v1.1.4
+  - Update documentation
 ### v1.1.3
   - Update documentation
 ### v1.1.2
