@@ -1,6 +1,6 @@
 {
-  "name": "@carboneio/carbone-sdk-js",
-  "version": "1.1.1",
+  "name": "carbone-sdk-js",
+  "version": "1.1.2",
   "description": "The javascript SDK to use Carbone Render easily ",
   "homepage": "https://github.com/carboneio/carbone-sdk-js",
   "main": "dist/main.js",
