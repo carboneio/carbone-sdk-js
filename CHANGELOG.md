@@ -1,3 +1,7 @@
+### v1.1.3
+  - Update documentation
+### v1.1.2
+  - Update documentation
 ### v1.1.1
   - Fix project name & update documentation
 ### v1.1.0

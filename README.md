@@ -1,5 +1,5 @@
 # Carbone Render Javascript SDK
-![Version](https://img.shields.io/badge/version-1.1.1-blue.svg?cacheSeconds=2592000)
+![Version](https://img.shields.io/badge/version-1.1.3-blue.svg?cacheSeconds=2592000)
 [![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen.svg)](./doc/API-REFERENCE.md)
 
 > The javascript SDK to use Carbone Render easily into your frontend (Angular, Vuejs, Svelte, React, Ember.js...).
@@ -10,13 +10,13 @@ Carbone is a report generator (PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV...) usi
 ## Install
 
 ```sh
-npm install --save @carboneio/carbone-sdk-js
+npm install --save carbone-sdk-js
 ```
 
 or
 
 ```sh
-yarn add @carboneio/carbone-sdk-js
+yarn add carbone-sdk-js
 ```
 
 ## Usage

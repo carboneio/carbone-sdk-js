@@ -5,11 +5,11 @@ The Carbone Javascript SDK provides a simple interface to communicate with Carbo
 ## Install the Javascript SDK
 
 ```sh
-npm install --save @carboneio/carbone-sdk-js
+npm install --save carbone-sdk-js
 ```
 or
 ```sh
-yarn add @carboneio/carbone-sdk-js
+yarn add carbone-sdk-js
 ```
 
 ## Quickstart with the Javascript SDK
