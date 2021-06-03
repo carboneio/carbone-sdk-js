@@ -18,7 +18,6 @@ describe("Tests configurations", function () {
     expect(_sdk.getAccessToken()).toStrictEqual("Lala");
   });
 
-
   test("should define and get the access token, api version and apiUrl", () => {
     expect(_carboneSDK.getAccessToken()).toBe("Token1234");
     expect(_carboneSDK.getApiUrl()).toBe("https://render.carbone.io");
@@ -179,17 +178,21 @@ describe("Test renderReport", function () {
   });
 
   test("should render a report from a templateId and a dataset", async () => {
-    const _data = {data: { name: "john" }, exportTo: "pdf"}
+    const _data = { data: { name: "john" }, exportTo: "pdf" };
     const _templateId =
       "f90e67221d7d5ee11058a000bdb997fb41bf149b1f88b45cb1aba9edcab8f868";
     const _renderId = "r3209jf903j2f90j2309fj3209fj";
-    fetchMock.post(
-      `https://render.carbone.io/render/${_templateId}`,
-      function (url, options) {
-        expect(JSON.parse(options.body)).toStrictEqual(_data);
-        return `{"success" : true,"error"   : null,"data": {"renderId": "` + _renderId + `"}}`;
-      }
-    );
+    fetchMock.post(`https://render.carbone.io/render/${_templateId}`, function (
+      url,
+      options
+    ) {
+      expect(JSON.parse(options.body)).toStrictEqual(_data);
+      return (
+        `{"success" : true,"error"   : null,"data": {"renderId": "` +
+        _renderId +
+        `"}}`
+      );
+    });
     const _resp = await _carboneSDK.renderReport(_templateId, _data);
     expect(_resp.success).toStrictEqual(true);
     expect(_resp.error).toStrictEqual(null);
@@ -215,13 +218,13 @@ describe("Test getReport", function () {
   });
 
   test("should get the template as a text", async () => {
-    const _filename = "OIQWJDWQOI.html"
+    const _filename = "OIQWJDWQOI.html";
     const _content = "<html>This is the report content</html>";
     fetchMock.get("https://render.carbone.io/render/renderId4321", {
       body: _content,
       headers: {
-        "content-disposition": `filename="${_filename}"`
-      }
+        "content-disposition": `filename="${_filename}"`,
+      },
     });
     const _response = await _carboneSDK.getReport("renderId4321", "text");
     expect(_response.content).toBe(_content);
@@ -230,13 +233,13 @@ describe("Test getReport", function () {
   });
 
   test("should get the template as a blob", async () => {
-    const _filename = "OIQWJDWQOI.xml"
+    const _filename = "OIQWJDWQOI.xml";
     const _content = "<html>This is the report content</html>";
     fetchMock.get("https://render.carbone.io/render/renderId4321", {
       body: _content,
       headers: {
-        "content-disposition": `filename="${_filename}"`
-      }
+        "content-disposition": `filename="${_filename}"`,
+      },
     });
     const _response = await _carboneSDK.getReport("renderId4321");
     // Convert blob to string
@@ -268,8 +271,8 @@ describe("Test render", function () {
     fetchMock.get(`https://render.carbone.io/render/${_renderId}`, {
       body: _expectedContent,
       headers: {
-        "content-disposition": `filename="${_expectedFileName}"`
-      }
+        "content-disposition": `filename="${_expectedFileName}"`,
+      },
     });
 
     const _renderResponse = await _carboneSDK.render(
@@ -286,36 +289,44 @@ describe("Test render", function () {
     fetchMock.reset();
   });
 
-  test("should render a report from an existing template, the template has already been uploaded (it generate the templateId + renderReport) [case 2]", async function() {
-    const _content = "<html>This is some content {d.firstname} {d.lastname}</html>";
-    const _templateId = "eced89abaf7ab36dfb5f1507759cd53c5347ef06a45f42e791b487ee45c7b404";
+  test("should render a report from an existing template, the template has already been uploaded (it generate the templateId + renderReport) [case 2]", async function () {
+    const _content =
+      "<html>This is some content {d.firstname} {d.lastname}</html>";
+    const _templateId =
+      "eced89abaf7ab36dfb5f1507759cd53c5347ef06a45f42e791b487ee45c7b404";
     const _renderId = "RenderId1234";
-    const _expectedFileName = "FOEWIFJEWO12324.pdf"
-    const _expectedContent = "<html>This is some content John Wick</html>"
+    const _expectedFileName = "FOEWIFJEWO12324.pdf";
+    const _expectedContent = "<html>This is some content John Wick</html>";
     fetchMock.post(
       `https://render.carbone.io/render/${_templateId}`,
       `{"success" : true, "error" : null,"data": {"renderId": "${_renderId}"}}`
     );
-    fetchMock.get(
-      `https://render.carbone.io/render/${_renderId}`,
-      {
-        body: _expectedContent,
-        headers: {
-          "content-disposition": `filename="${_expectedFileName}"`
-        }
-      }
-    )
-    const _response = await _carboneSDK.render(_content, {data: {firstname: "John", lastname: "Wick"}, exportTo:"pdf"}, "", "blob");
-     // Convert blob to string
-     const _resp = await _response.content.arrayBuffer().then((buf) => {
+    fetchMock.get(`https://render.carbone.io/render/${_renderId}`, {
+      body: _expectedContent,
+      headers: {
+        "content-disposition": `filename="${_expectedFileName}"`,
+      },
+    });
+    const _response = await _carboneSDK.render(
+      _content,
+      { data: { firstname: "John", lastname: "Wick" }, exportTo: "pdf" },
+      "",
+      "blob"
+    );
+    // Convert blob to string
+    const _resp = await _response.content.arrayBuffer().then((buf) => {
       return Buffer.from(buf).toString();
     });
     expect(_resp).toStrictEqual(_expectedContent);
     expect(_response.name).toStrictEqual(_expectedFileName);
 
     const _fetchCalls = fetchMock.calls();
-    expect(_fetchCalls[0][0]).toBe(`https://render.carbone.io/render/${_templateId}`);
-    expect(_fetchCalls[1][0]).toBe(`https://render.carbone.io/render/${_renderId}`);
+    expect(_fetchCalls[0][0]).toBe(
+      `https://render.carbone.io/render/${_templateId}`
+    );
+    expect(_fetchCalls[1][0]).toBe(
+      `https://render.carbone.io/render/${_renderId}`
+    );
     expect(_fetchCalls.length).toBe(2);
     fetchMock.reset();
   });
@@ -342,16 +353,16 @@ describe("Test render", function () {
       function () {
         _renderCounter++;
         if (_renderCounter >= 2) {
-          return `{"success" : true, "error" : null,"data": {"renderId": "${_renderId}"}}`
+          return `{"success" : true, "error" : null,"data": {"renderId": "${_renderId}"}}`;
         }
-        return `{"success" : false, "error" : "the template does not exist"}`
+        return `{"success" : false, "error" : "the template does not exist"}`;
       }
     );
     fetchMock.get(`https://render.carbone.io/render/${_renderId}`, {
       body: _expectedContent,
       headers: {
-        "content-disposition": `filename="${_expectedFileName}"`
-      }
+        "content-disposition": `filename="${_expectedFileName}"`,
+      },
     });
 
     const _response = await _carboneSDK.render(
@@ -368,16 +379,25 @@ describe("Test render", function () {
     expect(_response.name).toStrictEqual(_expectedFileName);
 
     const _fetchCalls = fetchMock.calls();
-    expect(_fetchCalls[0][0]).toBe(`https://render.carbone.io/render/${_templateId}`);
+    expect(_fetchCalls[0][0]).toBe(
+      `https://render.carbone.io/render/${_templateId}`
+    );
     expect(_fetchCalls[1][0]).toBe(`https://render.carbone.io/template`);
-    expect(_fetchCalls[2][0]).toBe(`https://render.carbone.io/render/${_templateId}`);
-    expect(_fetchCalls[3][0]).toBe(`https://render.carbone.io/render/${_renderId}`);
+    expect(_fetchCalls[2][0]).toBe(
+      `https://render.carbone.io/render/${_templateId}`
+    );
+    expect(_fetchCalls[3][0]).toBe(
+      `https://render.carbone.io/render/${_renderId}`
+    );
     expect(_fetchCalls.length).toBe(4);
     fetchMock.reset();
   });
 
   test("[error test] should throw because the template content is invalid", async function () {
-    fetchMock.post("https://render.carbone.io/render/e9b98135998afcefd4da38d000b284293e0f6c44abb17d2a31d8e1625e43eb21", { success: false })
+    fetchMock.post(
+      "https://render.carbone.io/render/e9b98135998afcefd4da38d000b284293e0f6c44abb17d2a31d8e1625e43eb21",
+      { success: false }
+    );
     fetchMock.post("https://render.carbone.io/template", {
       success: false,
       error: "invalid file",
@@ -394,9 +414,12 @@ describe("Test render", function () {
     fetchMock.post(`https://render.carbone.io/render/${_templateId}`, {
       success: false,
     });
-    fetchMock.post(`https://render.carbone.io/render/07015dd3447d7e1467ce24d847983465f61629883a8b2dd9ff3348118d3c4c93`, {
-      success: false,
-    });
+    fetchMock.post(
+      `https://render.carbone.io/render/07015dd3447d7e1467ce24d847983465f61629883a8b2dd9ff3348118d3c4c93`,
+      {
+        success: false,
+      }
+    );
     fetchMock.post("https://render.carbone.io/template", {
       success: true,
       data: { templateId: _templateId },
@@ -468,16 +491,21 @@ describe("Test Calculate hash templateId", function () {
   });
 
   test("should convert a file content as a buffer into a templateId 5 ", async function () {
-    const _content = new Buffer.from("<html>This is some content {d.firstname} {d.lastname}</html>");
+    const _content = new Buffer.from(
+      "<html>This is some content {d.firstname} {d.lastname}</html>"
+    );
     const _templateIdNode = global.generateTemplateIdFromNode(_content);
     const _templateId = await _carboneSDK.generateTemplateId(_content);
     expect(_templateId).toStrictEqual(_templateIdNode);
   });
 
   test("should convert a file content as a buffer into a templateId with a payload 6", async function () {
-    const _content = new Buffer.from("<html>This is some content {d.firstname} {d.lastname}</html>");
-    const _payload =
-      new Buffer.from("Payload1234This is a long payload with different characters 1 *5 &*9 %$ 3%&@9 @(( 3992288282 29299 9299929");
+    const _content = new Buffer.from(
+      "<html>This is some content {d.firstname} {d.lastname}</html>"
+    );
+    const _payload = new Buffer.from(
+      "Payload1234This is a long payload with different characters 1 *5 &*9 %$ 3%&@9 @(( 3992288282 29299 9299929"
+    );
     const _templateIdNode = global.generateTemplateIdFromNode(
       _content,
       _payload
@@ -492,19 +520,23 @@ describe("Test Calculate hash templateId", function () {
 
 describe("getReportNameFromHeader", () => {
   const _carboneSDK = carboneSDK("Token1234");
-  test("should parse the report file name on the header ", function() {
-    const _filename = "01EGN9TBHYTS3PVGRG6DCJC7HG.pdf"
+  test("should parse the report file name on the header ", function () {
+    const _filename = "01EGN9TBHYTS3PVGRG6DCJC7HG.pdf";
     const _headers = new Map();
     _headers.set("content-disposition", `filename="${_filename}"`);
-    expect(_carboneSDK.getReportNameFromHeader(_headers)).toStrictEqual(_filename);
+    expect(_carboneSDK.getReportNameFromHeader(_headers)).toStrictEqual(
+      _filename
+    );
   });
-  test("should parse the report file name (without double quotes) on the header ", function() {
-    const _filename = "01EGN9TBHYTS3PVGRG6DCJC7HG.pdf"
+  test("should parse the report file name (without double quotes) on the header ", function () {
+    const _filename = "01EGN9TBHYTS3PVGRG6DCJC7HG.pdf";
     const _headers = new Map();
     _headers.set("content-disposition", `filename=${_filename}`);
-    expect(_carboneSDK.getReportNameFromHeader(_headers)).toStrictEqual(_filename);
+    expect(_carboneSDK.getReportNameFromHeader(_headers)).toStrictEqual(
+      _filename
+    );
   });
-  test("should not parse the report file name on the header and return null", function() {
+  test("should not parse the report file name on the header and return null", function () {
     const _headers = new Map();
     _headers.set("content-disposition", `filename=`);
     expect(_carboneSDK.getReportNameFromHeader(_headers)).toStrictEqual(null);
