@@ -14,6 +14,7 @@ build({
   outfile: "./dist/main.js",
   format: "cjs",
 }).catch(() => process.exit(1));
+
 build({
   ...config,
   entryPoints: ["./src/main.js"],

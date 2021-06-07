@@ -1,3 +1,5 @@
+### v1.1.6
+  - generates a CJS module
 ### v1.1.5
   - Update documentation, license and lint code
 ### v1.1.4
