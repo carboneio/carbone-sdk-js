@@ -1,3 +1,6 @@
+### v1.1.7
+  - Update packages
+
 ### v1.1.6
   - generates a CJS module
 ### v1.1.5

@@ -466,7 +466,7 @@ describe("Test Calculate hash templateId", function () {
     expect(_templateId).toStrictEqual(_templateIdNode);
   });
 
-  test("should convert a file content as string into a templateId 3 ", async function () {
+  test("should convert a file content as string into a templateId 3", async function () {
     const _content =
       "<html>This is some content {d.firstname} {d.lastname}</html>";
     const _templateIdNode = global.generateTemplateIdFromNode(_content);
@@ -490,7 +490,7 @@ describe("Test Calculate hash templateId", function () {
     expect(_templateId).toStrictEqual(_templateIdNode);
   });
 
-  test("should convert a file content as a buffer into a templateId 5 ", async function () {
+  test("should convert a file content as a buffer into a templateId 5", async function () {
     const _content = new Buffer.from(
       "<html>This is some content {d.firstname} {d.lastname}</html>"
     );
@@ -520,7 +520,7 @@ describe("Test Calculate hash templateId", function () {
 
 describe("getReportNameFromHeader", () => {
   const _carboneSDK = carboneSDK("Token1234");
-  test("should parse the report file name on the header ", function () {
+  test("should parse the report file name on the header", function () {
     const _filename = "01EGN9TBHYTS3PVGRG6DCJC7HG.pdf";
     const _headers = new Map();
     _headers.set("content-disposition", `filename="${_filename}"`);
@@ -528,7 +528,7 @@ describe("getReportNameFromHeader", () => {
       _filename
     );
   });
-  test("should parse the report file name (without double quotes) on the header ", function () {
+  test("should parse the report file name (without double quotes) on the header", function () {
     const _filename = "01EGN9TBHYTS3PVGRG6DCJC7HG.pdf";
     const _headers = new Map();
     _headers.set("content-disposition", `filename=${_filename}`);
