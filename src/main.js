@@ -1,15 +1,59 @@
+
+
 /**
- * @description Carbone Render SDK Constructor, the access token have to be passed as the first parameter.
+ * @description Carbone Cloud SDK Constructor, the access token must be passed as first argument.
  *
  * @param {String} accessToken
  */
 const carboneSDK = function (accessToken) {
+
   const _config = {
-    apiUrl: "https://render.carbone.io",
+    apiUrl: "https://api.carbone.io",
     accessToken: accessToken,
-    apiVersion: 3,
+    apiVersion: 4,
+    apiHeaders: {}
   };
+
+  /** Private function for requests */
+  /**
+   *
+   * @param {String} method post/get/delete
+   * @param {String} path API endpoint
+   * @param {Object} options { body, headers }
+   * @returns
+   */
+  const request = function (method, path, options) {
+    return fetch(`${_config.apiUrl}${path}`, {
+      method: method,
+      ...(options?.body ? { body: options.body } : {}),
+      headers: {
+        "carbone-version": _config.apiVersion,
+        Authorization: "Bearer " + _config.accessToken,
+        ...(options?.headers ? options.headers : {}),
+        ...(_config?.apiHeaders ? _config.apiHeaders : {})
+      },
+    });
+  }
+
   return {
+    /**
+     * Set custom API headers
+     *
+     * @param {Object} headers Example: { "carbone-template-delete-after": "86400", "carbone-webhook-url": "https://..." }
+     */
+    setApiHeaders: function (headers) {
+      if (headers && typeof headers === "object") {
+        _config.apiHeaders = headers;
+      }
+    },
+    /**
+     * Get Custom API headers
+     *
+     * @returns {Object} headers
+     */
+    getApiHeaders: function () {
+      return _config.apiHeaders;
+    },
     /**
      * @returns {String} Return the access token
      */
@@ -61,14 +105,7 @@ const carboneSDK = function (accessToken) {
       }
       form.append("payload", payload);
       form.append("template", file);
-      const response = await fetch(`${_config.apiUrl}/template`, {
-        method: "post",
-        body: form,
-        headers: {
-          "carbone-version": _config.apiVersion,
-          Authorization: "Bearer " + _config.accessToken,
-        },
-      });
+      const response = await request("post", "/template", { body: form });
       return await response.json();
     },
     /**
@@ -82,13 +119,7 @@ const carboneSDK = function (accessToken) {
           "Carbone SDK deleteTemplate error: the templateId argument is not valid."
         );
       }
-      const response = await fetch(`${_config.apiUrl}/template/${templateId}`, {
-        method: "delete",
-        headers: {
-          "carbone-version": _config.apiVersion,
-          Authorization: "Bearer " + _config.accessToken,
-        },
-      });
+      const response = await request("delete", `/template/${templateId}`);
       return await response.json();
     },
     /**
@@ -108,13 +139,7 @@ const carboneSDK = function (accessToken) {
           "Carbone SDK getTemplate error: the responseType argument is not valid."
         );
       }
-      const response = await fetch(`${_config.apiUrl}/template/${templateId}`, {
-        method: "get",
-        headers: {
-          "carbone-version": _config.apiVersion,
-          Authorization: "Bearer " + _config.accessToken,
-        },
-      });
+      const response = await request("get", `/template/${templateId}`);
       return await response[responseType]();
     },
     /**
@@ -134,15 +159,7 @@ const carboneSDK = function (accessToken) {
           "Carbone SDK renderReport error: the data argument is not valid."
         );
       }
-      const response = await fetch(`${_config.apiUrl}/render/${templateId}`, {
-        method: "post",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-type": "application/json",
-          "carbone-version": _config.apiVersion,
-          Authorization: "Bearer " + _config.accessToken,
-        },
-      });
+      const response = await request("post", `/render/${templateId}`, { body: JSON.stringify(data), headers: { "Content-type": "application/json" } });
       return await response.json();
     },
     /**
@@ -162,13 +179,7 @@ const carboneSDK = function (accessToken) {
           "Carbone SDK getReport error: the responseType argument is not valid."
         );
       }
-      const response = await fetch(`${_config.apiUrl}/render/${renderId}`, {
-        method: "get",
-        headers: {
-          "carbone-version": _config.apiVersion,
-          Authorization: "Bearer " + _config.accessToken,
-        },
-      });
+      const response = await request("get", `/render/${renderId}`);
       return {
         content: await response[responseType](),
         name: this.getReportNameFromHeader(response.headers),
