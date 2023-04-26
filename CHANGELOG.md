@@ -1,3 +1,6 @@
+### v1.2.1
+  - Update documentation & examples
+
 ### v1.2.0
   - Updated default version of Carbone API from `3` to `4`
   - Added method `setApiHeaders` to add custom headers, headers will be added automatically to HTTP requests, usage:

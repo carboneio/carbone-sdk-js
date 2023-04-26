@@ -1,10 +1,10 @@
-# Carbone Render Javascript SDK
+# Carbone Cloud API Javascript SDK
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/carboneio/carbone-sdk-js?style=for-the-badge)
 [![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen.svg?style=for-the-badge)](./API-REFERENCE.md)
 
-The javascript SDK to use Carbone Render easily into your frontend (Angular, Vuejs, Svelte, React, Ember.js...).
+The javascript SDK to use Carbone Cloud easily into your frontend (Angular, Vuejs, Svelte, React, Ember.js...).
 
-> Carbone is a report generator (PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV...) using templates and JSON data.
+> Carbone is a document generator (PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV...) using templates and JSON data.
 [Learn more about the Carbone ecosystem](https://carbone.io/documentation.html).
 
 ## Install
@@ -23,7 +23,7 @@ yarn add carbone-sdk-js
 
 ```js
   import carboneSDK from "carbone-sdk-js";
-  // SDK constructor, the access token have to be passed as an argument to carboneRenderSDK
+  // SDK constructor, pass your private API key as the first argument
   const _carboneService = carboneSDK("eyJhbGc...");
   // Template from a file input OR template ID
   const _template = document.getElementById("inputFile").files[0];

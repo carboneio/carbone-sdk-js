@@ -133,3 +133,14 @@ function setApiVersion(version)
 It sets the the Carbone version requested. By default, it is calling the version `2` of Carbone.
 
 *Note:* You can only set a major version of carbone.
+
+### setApiHeaders
+
+Define custom API headers
+
+```js
+carboneSDK.setApiHeaders({
+  "carbone-template-delete-after": "86400",
+  "carbone-webhook-url": "https://..."
+});
+```
