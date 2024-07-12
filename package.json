@@ -3,7 +3,8 @@
   "version": "1.2.1",
   "description": "The javascript SDK to use Carbone Render easily ",
   "homepage": "https://github.com/carboneio/carbone-sdk-js",
-  "main": "dist/main.js",
+  "main": "dist/main.js", 
+  "typings": "dist/main.d.ts",
   "module": "dist/main.mjs",
   "repository": {
     "type": "git",
