@@ -8,6 +8,20 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+####### OS X
+.DS_Store*
+._*
+
+####### Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+ 
+ 
+####### Linux
+.directory
+*~
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 

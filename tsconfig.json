@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+      "module": "commonjs",
+      "noImplicitAny": true,
+      "removeComments": true,
+      "preserveConstEnums": true,
+      "sourceMap": true,
+      "outDir": "./dist"
+    },
+    "include": [
+      "src/**/*",
+      "dist/main.d.ts"
+    ],
+    "files": [
+      "src/main.js"
+    ]
+  }
