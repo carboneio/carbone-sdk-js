@@ -1,3 +1,8 @@
+### v1.2.2
+  - The `render` function throw explicit error messages when generating a document fails.
+  - Update dev dependencies
+
+
 ### v1.2.1
   - Update documentation & examples
 

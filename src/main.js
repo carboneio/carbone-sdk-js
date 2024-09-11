@@ -221,9 +221,8 @@ const carboneSDK = function (accessToken) {
         Object.prototype.hasOwnProperty.call(templateIdOrFile, "name") === false
       ) {
         _renderResponse = await this.renderReport(templateIdOrFile, data);
-      }
-      if (_renderResponse === null || _renderResponse.success === false) {
-        // 2 - if the report has already been uploaded: Generate the templateID from the content and render from the template id, if success false else try solution 3
+      }  else {
+        // 2 - If the template if a File/Blob: Generate the templateID from the content and render from the template id, if success false else try solution 3
         // if templateIdOrFile is a File or Blob, convert to uint8array - todo: test the uint8array conversion with JSDOM+JEST
         const _fileContentBuffer = await (typeof templateIdOrFile === "string"
           ? templateIdOrFile
@@ -241,14 +240,15 @@ const carboneSDK = function (accessToken) {
           // 3 - add the template, and render
           const _response = await this.addTemplate(templateIdOrFile, payload);
           if (
-            _response &&
-            _response.success === true &&
+            _response?.success === true &&
             _response.data.templateId
           ) {
             _renderResponse = await this.renderReport(
               _response.data.templateId,
               data
             );
+          } else {
+            throw new Error("Carbone Upload Template To Generate Document Error: " + _response?.error);
           }
         }
       }
@@ -257,7 +257,7 @@ const carboneSDK = function (accessToken) {
         _renderResponse.success === false ||
         !_renderResponse.data.renderId
       ) {
-        throw new Error("Carbone SDK render error: the rendering has failled.");
+        throw new Error("Carbone Generate Document Error: " + _renderResponse?.error);
       }
       return this.getReport(_renderResponse.data.renderId, responseType);
     },
@@ -337,6 +337,8 @@ const carboneSDK = function (accessToken) {
 };
 
 /** Compatibility v1 */
-window.carboneRenderSDK = carboneSDK;
-window.carboneSDK = carboneSDK;
+if(typeof window !== 'undefined') {
+  window.carboneRenderSDK = carboneSDK;
+  window.carboneSDK = carboneSDK;
+}
 export default carboneSDK;

@@ -104,6 +104,17 @@ describe("Test addTemplate", function () {
     );
     fetchMock.reset();
   });
+  test("should return an error if the template format is not supported", async () => {
+    var data = fs.readFileSync("./tests/template.xml");
+    const _requestResponse = {
+      success: false,
+      error: "File format not supported"
+    };
+    fetchMock.post("https://api.carbone.io/template", _requestResponse);
+    const _resp = await _carboneSDK.addTemplate(data.toString());
+    expect(_resp).toStrictEqual(_requestResponse);
+    fetchMock.reset();
+  });
 });
 
 describe("Test getTemplate", function () {
@@ -415,17 +426,20 @@ describe("Test render", function () {
   });
 
   test("[error test] should throw because the template content is invalid", async function () {
-    fetchMock.post(
-      "https://api.carbone.io/render/e9b98135998afcefd4da38d000b284293e0f6c44abb17d2a31d8e1625e43eb21",
-      { success: false }
-    );
     fetchMock.post("https://api.carbone.io/template", {
       success: false,
       error: "invalid file",
     });
+    fetchMock.post(
+      "https://api.carbone.io/render/e9b98135998afcefd4da38d000b284293e0f6c44abb17d2a31d8e1625e43eb21",
+      { 
+        success: false,
+        error: "the rendering has failled."
+      }
+    );
     await expect(() =>
       _carboneSDK.render("Some invalid content", {})
-    ).rejects.toThrow("Carbone SDK render error: the rendering has failled.");
+    ).rejects.toThrow("Carbone Upload Template To Generate Document Error: invalid file");
     fetchMock.reset();
   });
 
@@ -434,19 +448,14 @@ describe("Test render", function () {
       "20f36c2e4d1702a839ec001295696fa730a521d3afabed5f2ddc824c6897aea4";
     fetchMock.post(`https://api.carbone.io/render/${_templateId}`, {
       success: false,
+      error: "The Carbone tag '{list[i+1]}' is missing."
     });
-    fetchMock.post(
-      `https://api.carbone.io/render/07015dd3447d7e1467ce24d847983465f61629883a8b2dd9ff3348118d3c4c93`,
-      {
-        success: false,
-      }
-    );
     fetchMock.post("https://api.carbone.io/template", {
       success: true,
       data: { templateId: _templateId },
     });
     await expect(() => _carboneSDK.render(_templateId, {})).rejects.toThrow(
-      "Carbone SDK render error: the rendering has failled."
+      "Carbone Generate Document Error: The Carbone tag '{list[i+1]}' is missing."
     );
     fetchMock.reset();
   });

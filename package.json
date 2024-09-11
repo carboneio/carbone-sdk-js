@@ -1,6 +1,6 @@
 {
   "name": "carbone-sdk-js",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "The javascript SDK to use Carbone Render easily ",
   "homepage": "https://github.com/carboneio/carbone-sdk-js",
   "main": "dist/main.js",
@@ -21,16 +21,16 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@babel/preset-env": "=7.16.5",
-    "core-js": "=3.20.0",
-    "esbuild": "=0.17.18",
-    "eslint": "=8.5.0",
-    "eslint-config-prettier": "=8.3.0",
-    "eslint-plugin-jest": "=25.3.0",
+    "core-js": "=3.38.1",
+    "esbuild": "=0.23.1",
+    "eslint": "=9.10.0",
+    "eslint-config-prettier": "=9.1.0",
+    "eslint-plugin-jest": "=28.8.3",
     "fetch-mock-jest": "=1.5.1",
     "jest": "=26.6.3",
     "mocha": "=8.4.0",
     "node-fetch": "=2.6.1",
-    "prettier": "=2.0.5",
+    "prettier": "=3.3.3",
     "regenerator-runtime": "=0.13.7"
   }
 }
